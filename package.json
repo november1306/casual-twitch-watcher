@@ -1,0 +1,47 @@
+{
+  "name": "casual-twitch-watcher",
+  "version": "1.0.0",
+  "description": "stealth bot for automated twitch browsing",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:sannysoft": "playwright test tests/detection/sannysoft.spec.ts",
+    "test:browserscan": "playwright test tests/detection/browserscan.spec.ts",
+    "test:incolumitas": "playwright test tests/detection/incolumitas.spec.ts",
+    "test:intoli": "playwright test tests/detection/intoli.spec.ts",
+    "clean": "rimraf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/november1306/casual-twitch-watcher.git"
+  },
+  "keywords": [
+    "stealth",
+    "automation",
+    "twitch",
+    "bot",
+    "patchright",
+    "playwright"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/november1306/casual-twitch-watcher/issues"
+  },
+  "homepage": "https://github.com/november1306/casual-twitch-watcher#readme",
+  "dependencies": {
+    "patchright": "^1.52.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.10.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
