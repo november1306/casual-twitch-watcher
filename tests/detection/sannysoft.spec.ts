@@ -3,7 +3,7 @@ import { StealthBrowser } from '../../src/index';
 
 /**
  * bot.sannysoft.com Detection Tests
- * Tests classic automation detection markers
+ * Tests classic automation detection markers including WebGL spoofing
  */
 
 let stealth: StealthBrowser;
@@ -49,6 +49,22 @@ test('bot.sannysoft.com - Classic Detection Tests', async () => {
     return detections;
   });
 
+  // Verify WebGL spoofing is working
+  const webglInfo = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
+
+    if (!gl) return { error: 'WebGL not supported' };
+
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    return {
+      vendor: gl.getParameter(gl.VENDOR),
+      renderer: gl.getParameter(gl.RENDERER),
+      unmaskedVendor: ext ? gl.getParameter((ext as any).UNMASKED_VENDOR_WEBGL) : null,
+      unmaskedRenderer: ext ? gl.getParameter((ext as any).UNMASKED_RENDERER_WEBGL) : null
+    };
+  });
+
   // Take screenshot
   await page.screenshot({
     path: 'screenshots/bot-sannysoft-test.png',
@@ -74,6 +90,35 @@ test('bot.sannysoft.com - Classic Detection Tests', async () => {
       // Playwright assertion
       expect(passed, `${testName} should pass`).toBe(true);
     }
+  }
+
+  // Verify WebGL spoofing
+  console.log('🎭 WebGL Spoofing Verification:');
+  if ('error' in webglInfo) {
+    console.log(`   ❌ ${webglInfo.error}`);
+  } else {
+    console.log(`   Vendor: ${webglInfo.vendor} ✅`);
+    console.log(`   Renderer: ${webglInfo.renderer} ✅`);
+    console.log(`   Unmasked Vendor: ${webglInfo.unmaskedVendor} ✅`);
+    console.log(`   Unmasked Renderer: ${webglInfo.unmaskedRenderer} ✅`);
+
+    // Verify spoofed values are being returned
+    expect(webglInfo.vendor).toBe('WebKit');
+    expect(webglInfo.renderer).toBe('WebKit WebGL');
+    expect(webglInfo.unmaskedVendor).toBeTruthy();
+    expect(webglInfo.unmaskedRenderer).toBeTruthy();
+
+    // The important verification: check what Sannysoft actually sees
+    const webglVendorFromPage = results['WebGL Vendor'];
+    const webglRendererFromPage = results['WebGL Renderer'];
+
+    console.log(`🔍 Sannysoft sees - Vendor: "${webglVendorFromPage}", Renderer: "${webglRendererFromPage}"`);
+
+    // Verify Sannysoft sees our spoofed GPU instead of real hardware
+    expect(webglVendorFromPage).toMatch(/(NVIDIA Corporation|Intel Inc\.|ATI Technologies Inc\.)/);
+    expect(webglRendererFromPage).toMatch(/(NVIDIA|Intel|AMD)/);
+    expect(webglRendererFromPage).not.toContain('SwiftShader'); // Not software rendering
+    expect(webglRendererFromPage).not.toContain('Google'); // Not obviously fake
   }
 
   // Log all other results for analysis

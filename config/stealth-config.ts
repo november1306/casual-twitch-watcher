@@ -1,8 +1,15 @@
 /**
- * Stealth Browser Configuration
- * Centralized settings for anti-detection automation
+ * Advanced Stealth Browser Configuration
+ *
+ * Comprehensive settings for anti-detection automation with environment-specific
+ * configurations optimized for different use cases.
  */
 
+import { WebGLSpoofConfig } from '../src/webgl-spoof';
+
+/**
+ * Main stealth configuration interface
+ */
 export interface StealthConfig {
     browser: BrowserConfig;
     context: ContextConfig;
@@ -10,180 +17,318 @@ export interface StealthConfig {
     fingerprint: FingerprintConfig;
 }
 
+/**
+ * Browser launch configuration
+ */
 export interface BrowserConfig {
+    /** Whether to run in headless mode */
     headless: boolean;
+    /** Chrome launch arguments for stealth operation */
     args: string[];
+    /** Artificial delay between actions (milliseconds) */
     slowMo?: number;
+    /** Browser launch timeout (milliseconds) */
     timeout: number;
 }
 
+/**
+ * Browser context configuration
+ */
 export interface ContextConfig {
+    /** Viewport dimensions */
     viewport: { width: number; height: number };
+    /** User-Agent string to present */
     userAgent: string;
+    /** Browser locale setting */
     locale: string;
+    /** Timezone identifier */
     timezoneId: string;
+    /** Geolocation coordinates (optional) */
     geolocation?: { longitude: number; latitude: number };
+    /** Permissions to grant */
     permissions: string[];
+    /** Additional HTTP headers */
     extraHTTPHeaders?: Record<string, string>;
 }
 
+/**
+ * Behavioral simulation configuration
+ */
 export interface BehaviorConfig {
+    /** Minimum delay between actions (milliseconds) */
     minDelay: number;
+    /** Maximum delay between actions (milliseconds) */
     maxDelay: number;
-    navigationDelay: { min: number; max: number };
-    actionDelay: { min: number; max: number };
-    scrollSpeed: number;
-}
-
-export interface FingerprintConfig {
-    enableJavaScript: boolean;
-    enableImages: boolean;
-    enableCSS: boolean;
-    blockAds: boolean;
-    spoofWebGL: boolean;
+    /** Enable mouse movement simulation */
+    simulateMouseMovement: boolean;
+    /** Enable typing delay simulation */
+    simulateTypingDelay: boolean;
+    /** Enable scroll behavior simulation */
+    simulateScrolling: boolean;
 }
 
 /**
- * Default stealth configuration optimized for bypassing detection
+ * Fingerprinting configuration
  */
-export const defaultStealthConfig: StealthConfig = {
-    browser: {
-        headless: false, // Keep false for initial testing
-        slowMo: 0, // No artificial slowdown
-        timeout: 30000,
-        args: [
-            // Core stealth args (some redundant with Patchright patches)
-            '--no-first-run',
-            '--no-default-browser-check',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-web-security',
-            '--disable-features=VizDisplayCompositor',
+export interface FingerprintConfig {
+    /** Enable JavaScript execution */
+    enableJavaScript: boolean;
+    /** Enable image loading */
+    enableImages: boolean;
+    /** Enable CSS loading */
+    enableCSS: boolean;
+    /** Block advertisements */
+    blockAds: boolean;
+    /** Enable WebGL spoofing */
+    spoofWebGL: boolean;
+    /** WebGL configuration to use (optional) */
+    webglConfig?: WebGLSpoofConfig;
+}
 
-            // Window and display
-            '--window-size=1366,768',
-            '--start-maximized',
+/**
+ * Environment-specific configurations
+ */
+const configurations = {
+    /**
+     * Development configuration - Visible browser with debugging features
+     */
+    development: {
+        browser: {
+            headless: false,
+            args: [
+                // Core stealth arguments
+                '--no-first-run',
+                '--no-default-browser-check',
+                '--disable-dev-shm-usage',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-web-security',
+                '--disable-features=VizDisplayCompositor',
 
-            // Memory and performance
-            '--memory-pressure-off',
-            '--max_old_space_size=4096',
+                // Window and display
+                '--window-size=1366,768',
+                '--start-maximized',
 
-            // Network and security
-            '--disable-background-timer-throttling',
-            '--disable-backgrounding-occluded-windows',
-            '--disable-renderer-backgrounding',
-            '--disable-field-trial-config',
-            '--disable-ipc-flooding-protection',
+                // Memory and performance
+                '--memory-pressure-off',
+                '--max_old_space_size=4096',
 
-            // User experience
-            '--disable-background-networking',
-            '--disable-default-apps',
-            '--disable-sync',
-            '--disable-translate',
-            '--hide-scrollbars',
-            '--mute-audio',
+                // GPU and WebGL support
+                '--enable-webgl',
+                '--enable-accelerated-2d-canvas',
+                '--disable-gpu-sandbox',
 
-            // Additional stealth
-            '--disable-logging',
-            '--disable-plugins',
-            '--disable-plugins-discovery',
-            '--disable-preconnect'
-        ]
-    },
+                // Network and security
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding',
+                '--disable-features=TranslateUI',
+                '--disable-component-extensions-with-background-pages',
 
-    context: {
-        viewport: { width: 1366, height: 768 },
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        locale: 'en-US',
-        timezoneId: 'America/New_York',
-        geolocation: { longitude: -74.006, latitude: 40.7128 }, // NYC coordinates
-        permissions: ['geolocation'],
-        extraHTTPHeaders: {
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-User': '?1',
-            'Sec-Fetch-Dest': 'document'
+                // Development specific
+                '--remote-debugging-port=9222',
+                '--enable-logging',
+                '--v=1'
+            ],
+            slowMo: 100,
+            timeout: 30000
+        },
+        context: {
+            viewport: { width: 1366, height: 768 },
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            locale: 'en-US',
+            timezoneId: 'America/New_York',
+            geolocation: { longitude: -74.0060, latitude: 40.7128 }, // New York
+            permissions: ['notifications', 'geolocation']
+        },
+        behavior: {
+            minDelay: 100,
+            maxDelay: 300,
+            simulateMouseMovement: true,
+            simulateTypingDelay: true,
+            simulateScrolling: true
+        },
+        fingerprint: {
+            enableJavaScript: true,
+            enableImages: true,
+            enableCSS: true,
+            blockAds: false,
+            spoofWebGL: true
         }
     },
 
-    behavior: {
-        minDelay: 500,
-        maxDelay: 2000,
-        navigationDelay: { min: 1000, max: 3000 },
-        actionDelay: { min: 200, max: 800 },
-        scrollSpeed: 100 // pixels per scroll
+    /**
+     * Production configuration - Optimized for real-world stealth operation
+     */
+    production: {
+        browser: {
+            headless: true,
+            args: [
+                // Core stealth arguments
+                '--no-first-run',
+                '--no-default-browser-check',
+                '--disable-dev-shm-usage',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-web-security',
+                '--disable-features=VizDisplayCompositor',
+
+                // Window and display
+                '--window-size=1920,1080',
+                '--start-maximized',
+
+                // Memory and performance
+                '--memory-pressure-off',
+                '--max_old_space_size=4096',
+
+                // GPU and WebGL support
+                '--enable-webgl',
+                '--enable-accelerated-2d-canvas',
+                '--disable-gpu-sandbox',
+
+                // Network and security
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding',
+                '--disable-features=TranslateUI',
+                '--disable-component-extensions-with-background-pages',
+
+                // Production optimizations
+                '--disable-logging',
+                '--silent',
+                '--disable-extensions',
+                '--disable-plugins'
+            ],
+            slowMo: 50,
+            timeout: 60000
+        },
+        context: {
+            viewport: { width: 1920, height: 1080 },
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            locale: 'en-US',
+            timezoneId: 'America/New_York',
+            permissions: ['notifications']
+        },
+        behavior: {
+            minDelay: 50,
+            maxDelay: 150,
+            simulateMouseMovement: true,
+            simulateTypingDelay: true,
+            simulateScrolling: false
+        },
+        fingerprint: {
+            enableJavaScript: true,
+            enableImages: true,
+            enableCSS: true,
+            blockAds: true,
+            spoofWebGL: true
+        }
     },
 
-    fingerprint: {
-        enableJavaScript: true,
-        enableImages: true,
-        enableCSS: true,
-        blockAds: false, // Don't block ads initially to avoid detection
-        spoofWebGL: false // Patchright handles this
+    /**
+     * Testing configuration - Fast and reliable for automated testing
+     */
+    testing: {
+        browser: {
+            headless: true,
+            args: [
+                // Core stealth arguments
+                '--no-first-run',
+                '--no-default-browser-check',
+                '--disable-dev-shm-usage',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-web-security',
+                '--disable-features=VizDisplayCompositor',
+
+                // Testing optimizations
+                '--disable-extensions',
+                '--disable-plugins',
+                '--disable-images',
+                '--disable-javascript',
+                '--disable-logging',
+                '--silent',
+
+                // GPU and WebGL support
+                '--enable-webgl',
+                '--enable-accelerated-2d-canvas',
+                '--disable-gpu-sandbox',
+
+                // Memory and performance
+                '--memory-pressure-off',
+                '--max_old_space_size=2048'
+            ],
+            slowMo: 0,
+            timeout: 30000
+        },
+        context: {
+            viewport: { width: 1366, height: 768 },
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            locale: 'en-US',
+            timezoneId: 'America/New_York',
+            permissions: []
+        },
+        behavior: {
+            minDelay: 0,
+            maxDelay: 50,
+            simulateMouseMovement: false,
+            simulateTypingDelay: false,
+            simulateScrolling: false
+        },
+        fingerprint: {
+            enableJavaScript: true,
+            enableImages: false,
+            enableCSS: true,
+            blockAds: false,
+            spoofWebGL: true
+        }
     }
 };
 
 /**
- * Production stealth configuration (more aggressive)
+ * Gets the stealth configuration for the specified environment
+ *
+ * @param environment - The target environment
+ * @returns Complete stealth configuration
  */
-export const productionStealthConfig: StealthConfig = {
-    ...defaultStealthConfig,
-    browser: {
-        ...defaultStealthConfig.browser,
-        headless: true, // Run headless in production
-        slowMo: 50 // Slight delay to appear more human
-    },
-    behavior: {
-        ...defaultStealthConfig.behavior,
-        minDelay: 1000,
-        maxDelay: 4000,
-        navigationDelay: { min: 2000, max: 5000 },
-        actionDelay: { min: 500, max: 1500 }
-    }
-};
+export function getStealthConfig(environment: keyof typeof configurations = 'development'): StealthConfig {
+    const config = configurations[environment];
 
-/**
- * Testing configuration (for fingerprint tests)
- */
-export const testingStealthConfig: StealthConfig = {
-    ...defaultStealthConfig,
-    browser: {
-        ...defaultStealthConfig.browser,
-        headless: false, // Keep visible for inspection
-        slowMo: 100 // Slight delay for observation
+    if (!config) {
+        throw new Error(`Unknown environment: ${environment}. Available: ${Object.keys(configurations).join(', ')}`);
     }
-};
 
-/**
- * Get configuration based on environment
- */
-export function getStealthConfig(env: 'development' | 'production' | 'testing' = 'development'): StealthConfig {
-    switch (env) {
-        case 'production':
-            return productionStealthConfig;
-        case 'testing':
-            return testingStealthConfig;
-        default:
-            return defaultStealthConfig;
-    }
+    return config;
 }
 
 /**
- * Utility to generate random user agents (for future use)
+ * Gets available environment names
+ *
+ * @returns Array of available environment names
  */
-export const userAgents = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-];
+export function getAvailableEnvironments(): string[] {
+    return Object.keys(configurations);
+}
 
-export function getRandomUserAgent(): string {
-    return userAgents[Math.floor(Math.random() * userAgents.length)];
+/**
+ * Validates a stealth configuration
+ *
+ * @param config - Configuration to validate
+ * @returns True if valid, throws error if invalid
+ */
+export function validateStealthConfig(config: StealthConfig): boolean {
+    // Basic validation
+    if (!config.browser || !config.context || !config.behavior || !config.fingerprint) {
+        throw new Error('Invalid configuration: missing required sections');
+    }
+
+    if (config.context.viewport.width < 1 || config.context.viewport.height < 1) {
+        throw new Error('Invalid viewport dimensions');
+    }
+
+    if (config.behavior.minDelay < 0 || config.behavior.maxDelay < config.behavior.minDelay) {
+        throw new Error('Invalid behavior delay configuration');
+    }
+
+    return true;
 }

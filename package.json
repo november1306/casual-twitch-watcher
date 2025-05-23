@@ -1,47 +1,49 @@
 {
   "name": "casual-twitch-watcher",
   "version": "1.0.0",
-  "description": "stealth bot for automated twitch browsing",
-  "main": "dist/index.js",
+  "description": "Advanced stealth browser automation with comprehensive anti-detection features including WebGL spoofing, behavioral simulation, and fingerprint masking.",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "keywords": [
+    "automation",
+    "stealth",
+    "bot-detection",
+    "webgl-spoofing",
+    "fingerprinting",
+    "playwright",
+    "patchright",
+    "anti-detection"
+  ],
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/index.ts",
-    "start": "node dist/index.js",
+    "clean": "rimraf dist",
+    "dev": "tsc --watch",
     "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed",
-    "test:report": "playwright show-report",
     "test:sannysoft": "playwright test tests/detection/sannysoft.spec.ts",
-    "test:browserscan": "playwright test tests/detection/browserscan.spec.ts",
     "test:incolumitas": "playwright test tests/detection/incolumitas.spec.ts",
+    "test:browserscan": "playwright test tests/detection/browserscan.spec.ts",
     "test:intoli": "playwright test tests/detection/intoli.spec.ts",
-    "clean": "rimraf dist"
+    "test:all-detection": "playwright test tests/detection/",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/november1306/casual-twitch-watcher.git"
+    "url": "https://github.com/your-username/stealth-browser-automation.git"
   },
-  "keywords": [
-    "stealth",
-    "automation",
-    "twitch",
-    "bot",
-    "patchright",
-    "playwright"
-  ],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/november1306/casual-twitch-watcher/issues"
-  },
-  "homepage": "https://github.com/november1306/casual-twitch-watcher#readme",
-  "dependencies": {
-    "patchright": "^1.52.0"
-  },
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
-    "@types/node": "^22.10.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "patchright": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
